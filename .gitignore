@@ -1,0 +1,6 @@
+# ignore all "local" terraform files
+.terraform
+.terraform.*
+
+# temp work folder used for plan/apply/destroy/import/state
+work
