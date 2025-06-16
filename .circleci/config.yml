@@ -51,3 +51,9 @@ jobs:
           command: |
             echo "Running deployment commands...."
             gcloud compute instances list --project $GCP_PROJECT_ID
+
+# Orchestrate our job run sequence
+workflows:
+  verify-gcp-oidc-access:
+    jobs:
+      - deploy
