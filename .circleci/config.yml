@@ -7,11 +7,11 @@ jobs:
   deploy:
     docker:
       - image: google/cloud-sdk:latest
-    environment:
-      GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
-      GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
-      GCP_WIP_ID: "<your-wip-pool-id>" # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
-      GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
+    # environment:
+    #   GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
+    #   GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
+    #   GCP_WIP_ID: "<your-wip-pool-id>" # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
+    #   GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
     steps:
       - checkout
 
