@@ -1,32 +1,53 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/jobs-steps/#jobs-overview & https://circleci.com/docs/configuration-reference/#jobs
+orbs:
+  gcp-cli: circleci/gcp-cli@2.4.0
+
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/executor-intro/ & https://circleci.com/docs/configuration-reference/#executor-job
+  deploy:
     docker:
-      # Specify the version you desire here
-      # See: https://circleci.com/developer/images/image/cimg/base
-      - image: cimg/base:current
-
-    # Add steps to the job
-    # See: https://circleci.com/docs/jobs-steps/#steps-overview & https://circleci.com/docs/configuration-reference/#steps
+      - image: google/cloud-sdk:latest
+    environment:
+      GCP_PROJECT_ID: "<your-gcp-project-id>"          # set in CircleCI project settings
+      GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>"     # service account email with WIF enabled
+      GCP_WIP_ID: "<your-wip-pool-id>"                 # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
+      GCP_WIP_PROVIDER_ID: "<your-provider-id>"        # e.g. "my-provider"
     steps:
-      # Checkout the code as the first step.
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/workflows/ & https://circleci.com/docs/configuration-reference/#workflows
-workflows:
-  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
-    jobs:
-      - say-hello:
-        context: gcloud-deploy
+      - run:
+          name: Authenticate using OIDC and configure credentials
+          command: |
+            echo "Retrieving ID token from CircleCI OIDC..."
+            ID_TOKEN=$(curl -s -H "Metadata-Flavor: CircleCI" "$CIRCLE_OIDC_TOKEN_V2")
+
+            echo "Creating credential config for GCP federation..."
+            cat > gcp_cred_config.json <<EOF
+            {
+              "type": "external_account",
+              "audience": "//iam.googleapis.com/${GCP_WIP_ID}/providers/${GCP_WIP_PROVIDER_ID}",
+              "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
+              "token_url": "https://sts.googleapis.com/v1/token",
+              "credential_source": {
+                "file": "/tmp/oidc_token"
+              },
+              "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT_EMAIL}:generateAccessToken"
+            }
+EOF
+
+            echo "$ID_TOKEN" > /tmp/oidc_token
+
+            echo "Activating service account with impersonation..."
+            gcloud auth login --brief --cred-file=gcp_cred_config.json
+
+            echo "Verifying identity..."
+            gcloud auth print-identity-token
+
+            echo "Testing authentication..."
+            gcloud projects get-iam-policy $GCP_PROJECT_ID --format=json
+
+      - run:
+          name: Deploy step (replace with your actual logic)
+          command: |
+            echo "Running deployment commands..."
+            gcloud compute instances list --project $GCP_PROJECT_ID
