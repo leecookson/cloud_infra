@@ -49,5 +49,5 @@ jobs:
       - run:
           name: Deploy step (replace with your actual logic)
           command: |
-            echo "Running deployment commands..."
+            echo "Running deployment commands...."
             gcloud compute instances list --project $GCP_PROJECT_ID
