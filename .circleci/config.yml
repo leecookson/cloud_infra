@@ -22,7 +22,7 @@ jobs:
             ID_TOKEN=$(curl -s -H "Metadata-Flavor: CircleCI" "$CIRCLE_OIDC_TOKEN_V2")
 
             echo "Creating credential config for GCP federation..."
-            cat > gcp_cred_config.json <<EOF
+            cat > gcp_cred_config.json \<<EOF
             {
               "type": "external_account",
               "audience": "//iam.googleapis.com/${GCP_WIP_ID}/providers/${GCP_WIP_PROVIDER_ID}",
