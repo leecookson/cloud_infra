@@ -48,7 +48,7 @@ jobs:
       - gcp-cli/setup:
           version: 404.0.0
       - run:
-          commsnd: tfscripts/tfplan gcp
+          command: tfscripts/tfplan gcp
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:
