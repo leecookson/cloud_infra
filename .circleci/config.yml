@@ -45,6 +45,7 @@ jobs:
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
+          use_oidc: true
       - run:
           command: tfscripts/tfplan gcp
 # Orchestrate our job run sequence
