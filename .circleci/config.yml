@@ -27,7 +27,7 @@ jobs:
           profile_name: oidc-profile
           role_arn: AWS_DEPLOY_IAM_ROLE
           role_session_name: oidc-session
-          session_duration: 1800
+          session_duration: "1800"
       - run:
           name: Log-into-AWS
           command: |
