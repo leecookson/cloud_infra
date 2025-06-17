@@ -43,7 +43,6 @@ jobs:
     executor: gcp-cli/default
     steps:
       - checkout
-      - tf-setup
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
