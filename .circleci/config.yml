@@ -5,17 +5,18 @@ orbs:
 
 jobs:
   gcp-test:
-    docker:
-      - image: google/cloud-sdk:latest
-    # environment:
-    #   GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
-    #   GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
-    #   GCP_WIP_ID: "<your-wip-pool-id>" # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
-    #   GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
+    executor: gcp-cli/default
     steps:
       - checkout
-      - gcp-cli/setup
+      - gcp-cli/setup:
+          version: 404.0.0
+          use_oidc: true
 
+      # environment:
+      #   GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
+      #   GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
+      #   GCP_WIP_ID: "<your-wip-pool-id>" # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
+      #   GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
       - run:
           name: Deploy step (replace with your actual logic)
           command: |
