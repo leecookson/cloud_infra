@@ -12,11 +12,6 @@ jobs:
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
-      # environment:
-      #   GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
-      #   GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
-      #   GCP_WIP_ID: "<your-wip-pool-id>" # e.g. "projects/123456789/locations/global/workloadIdentityPools/my-pool"
-      #   GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
       - run:
           name: Deploy step (replace with your actual logic)
           command: |
@@ -24,8 +19,7 @@ jobs:
             gcloud iam workload-identity-pools list --location=global
 
   aws-init:
-    docker:
-      - image: cimg/aws:2022.06
+    executor: aws-cli/default
     steps:
       - checkout
       # run the aws-cli/setup command from the orb
@@ -39,7 +33,7 @@ jobs:
       - run:
           name: Log-into-AWS
           command: |
-            aws s3 list-buckets --profile "OIDC-PROFILE"
+            aws s3 ls --profile "OIDC-PROFILE"
   tf-setup:
     docker:
       - image: cimg/base:stable
