@@ -46,7 +46,8 @@ jobs:
     steps:
       - run:
           name: Clone TF Scripts repository
-          command: git clone TF_SCRIPTS_REPO ~/tfscripts  tf-plan:
+          command: git clone TF_SCRIPTS_REPO ~/tfscripts
+  tf-plan:
     executor: gcp-cli/default
     steps:
       - checkout
