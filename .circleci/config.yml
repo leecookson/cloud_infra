@@ -41,18 +41,19 @@ jobs:
           command: |
             aws s3 list-buckets --profile "OIDC-PROFILE"
   tf-setup:
-    - run:
-      name: Clone TF Scripts repository
-      command: >-
-        git clone TF_SCRIPTS_REPO ~/tfscripts
-  tf-plan:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Clone TF Scripts repository
+          command: git clone TF_SCRIPTS_REPO ~/tfscripts  tf-plan:
     executor: gcp-cli/default
     steps:
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
       - run |
-        tfscripts/tf-plan
+        tfscripts/tfplan gcp
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:
@@ -62,5 +63,8 @@ workflows:
     jobs:
       - tf-setup
       - tf-plan:
-        requires:
-          - tf-setup
+          requires:
+            - tf-setup
+  verify-aws-oidc-access:
+    jobs:
+      - aws-init
