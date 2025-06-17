@@ -4,3 +4,7 @@ variable "project_id" {
 variable "billing_account_id" {
   type = string
 }
+
+variable "circleci_org_uuid" {
+  type = string
+}
