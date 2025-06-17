@@ -1,26 +1,14 @@
-# terraform import google_iam_workload_identity_pool.circleci circleci-deploys
+module "circleci_oidc" {
+  source = "solidblocks/circleci-oidc/google"
 
-resource "google_iam_workload_identity_pool" "circleci" {
-  project                   = google_project.cookson_pro.project_id
-  workload_identity_pool_id = "circleci-deploys"
-  display_name              = "CircleCI Deploys"
-  description               = "OIDC for CircleCI deploys"
+  version         = "0.0.2"
+  circleci_org_id = "71adbdf0-f90e-46e6-8cc2-09fa83fac452"
 }
 
-#terraform import google_iam_workload_identity_pool_provider.circleci circleci-deploys/circleci
-
-resource "google_iam_workload_identity_pool_provider" "circleci" {
-  project                            = google_project.cookson_pro.project_id
-  workload_identity_pool_id          = google_iam_workload_identity_pool.circleci.workload_identity_pool_id
-  workload_identity_pool_provider_id = "circleci"
-  display_name                       = "CircleCI"
-  attribute_mapping = {
-    "google.subject"     = "assertion.sub"
-    "attribute.audience" = "assertion.aud"
-    "attribute.project"  = "assertion['oidc.circleci.com/project-id']"
-    "attribute.context"  = "assertion['oidc.circleci.com/context-ids']"
-  }
-  oidc {
-    issuer_uri = "https://oidc.circleci.com/org/71adbdf0-f90e-46e6-8cc2-09fa83fac452"
-  }
+# Assign the 'roles/owner' role at the project level to the service account
+resource "google_project_iam_member" "project_owner_binding" {
+  project = google_project.cookson_pro.project_id
+  role    = "roles/owner"
+  member  = "serviceAccount:${module.circleci_oidc.service_account_email}"
 }
+
