@@ -2,16 +2,16 @@ version: 2.1
 
 orbs:
   gcp-cli: circleci/gcp-cli@3.3.1
+  aws-cli: circleci/aws-cli@4.0.0
 
 jobs:
-  gcp-test:
+  gcp-init:
     executor: gcp-cli/default
     steps:
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
-
       # environment:
       #   GCP_PROJECT_ID: "<your-gcp-project-id>" # set in CircleCI project settings
       #   GCP_SERVICE_ACCOUNT_EMAIL: "<your-sa-email>" # service account email with WIF enabled
@@ -23,8 +23,44 @@ jobs:
             echo "Running deployment commands...."
             gcloud iam workload-identity-pools list --location=global
 
+  aws-init:
+    docker:
+      - image: cimg/aws:2022.06
+    steps:
+      - checkout
+      # run the aws-cli/setup command from the orb
+      - aws-cli/setup:
+          role-arn: AWS_DEPLOY_IAM_ROLE
+          aws-region: "us-east-1"
+          # optional parameters
+          profile-name: "OIDC-PROFILE"
+          role-session-name: “oidc-session”
+          session-duration: 1800
+      - run:
+          name: Log-into-AWS
+          command: |
+            aws s3 list-buckets --profile "OIDC-PROFILE"
+  tf-setup:
+    - run:
+      name: Clone TF Scripts repository
+      command: >-
+        git clone TF_SCRIPTS_REPO ~/tfscripts
+  tf-plan:
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - gcp-cli/setup:
+          version: 404.0.0
+      - run |
+        tfscripts/tf-plan
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:
     jobs:
-      - gcp-test
+      - gcp-init
+  gcp-plan:
+    jobs:
+      - tf-setup
+      - tf-plan:
+        requires:
+          - tf-setup
