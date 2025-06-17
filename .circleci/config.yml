@@ -25,7 +25,7 @@ jobs:
       # run the aws-cli/setup command from the orb
       - aws-cli/setup:
           profile_name: oidc-profile
-          role_arn: AWS_DEPLOY_IAM_ROLE
+          role_arn: ${AWS_DEPLOY_IAM_ROLE}
           role_session_name: oidc-session
           session_duration: "1800"
       - run:
