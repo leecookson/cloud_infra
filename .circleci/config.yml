@@ -24,12 +24,10 @@ jobs:
       - checkout
       # run the aws-cli/setup command from the orb
       - aws-cli/setup:
-          role-arn: AWS_DEPLOY_IAM_ROLE
-          aws-region: "us-east-1"
-          # optional parameters
-          profile-name: "OIDC-PROFILE"
-          role-session-name: “oidc-session”
-          session-duration: 1800
+          profile_name: oidc-profile
+          role_arn: AWS_DEPLOY_IAM_ROLE
+          role_session_name: oidc-session
+          session_duration: 1800
       - run:
           name: Log-into-AWS
           command: |
