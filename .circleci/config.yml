@@ -4,7 +4,7 @@ orbs:
   gcp-cli: circleci/gcp-cli@2.4.0
 
 jobs:
-  deploy:
+  gcp-test:
     docker:
       - image: google/cloud-sdk:latest
     # environment:
@@ -14,46 +14,16 @@ jobs:
     #   GCP_WIP_PROVIDER_ID: "<your-provider-id>" # e.g. "my-provider"
     steps:
       - checkout
-
-      - run:
-          name: Authenticate using OIDC and configure credentials
-          command: |
-            echo "Retrieving ID token from CircleCI OIDC..."
-            ID_TOKEN=$(curl -s -H "Metadata-Flavor: CircleCI" "$CIRCLE_OIDC_TOKEN_V2")
-
-            echo "Creating credential config for GCP federation..."
-            cat > gcp_cred_config.json \<<EOF
-            {
-              "type": "external_account",
-              "audience": "//iam.googleapis.com/${GCP_WIP_ID}/providers/${GCP_WIP_PROVIDER_ID}",
-              "subject_token_type": "urn:ietf:params:oauth:token-type:id_token",
-              "token_url": "https://sts.googleapis.com/v1/token",
-              "credential_source": {
-                "file": "/tmp/oidc_token"
-              },
-              "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_SERVICE_ACCOUNT_EMAIL}:generateAccessToken"
-            }
-            EOF
-
-            echo "$ID_TOKEN" > /tmp/oidc_token
-
-            echo "Activating service account with impersonation..."
-            gcloud auth login --brief --cred-file=gcp_cred_config.json
-
-            echo "Verifying identity..."
-            gcloud auth print-identity-token
-
-            echo "Testing authentication..."
-            gcloud projects get-iam-policy $GCP_PROJECT_ID --format=json
+      - gcp-cli/setup
 
       - run:
           name: Deploy step (replace with your actual logic)
           command: |
             echo "Running deployment commands...."
-            gcloud compute instances list --project $GCP_PROJECT_ID
+            gcloud iam workload-identity-pools list --location=global
 
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:
     jobs:
-      - deploy
+      - gcp-test
