@@ -47,7 +47,7 @@ jobs:
           version: 404.0.0
           use_oidc: true
       - run:
-          command: ls tfscripts;tfscripts/tfplan gcp
+          command: ls /home/circleci/tfscripts;/home/circleci/tfscripts/tfplan gcp
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:
