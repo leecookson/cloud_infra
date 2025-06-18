@@ -33,7 +33,7 @@ jobs:
           name: Log-into-AWS
           command: |
             aws s3 ls --profile "oidc-profile"
-  tf-plan:
+  gcp-tf-plan:
     executor: gcp-cli/default
     steps:
       - checkout
@@ -43,6 +43,18 @@ jobs:
       - tf-scripts/install
       - run:
           command: which tfplan;tfplan gcp
+  aws-tf-plan:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup:
+          profile_name: "oidc-profile"
+          role_arn: "arn:aws:iam::021874127869:role/circle_ci_deploy"
+          role_session_name: "oidc-session"
+          session_duration: "1800"
+      - tf-scripts/install
+      - run:
+          command: which tfplan;tfplan aws
 # Orchestrate our job run sequence
 workflows:
   verify-gcp-oidc-access:

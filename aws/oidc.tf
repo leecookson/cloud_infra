@@ -3,7 +3,7 @@ module "circleci-oidc-provider" {
   version            = "0.0.1"
   circleci_role_name = var.circleci_deploy_role_name
   circleci_org_uuid  = var.circleci_org_uuid
-  circleci_project_uuids = var.circleci_deploy_project_ids
+  circleci_project_uuids = ["*"]
 
   circleci_oidc_role_attach_policies = [
     "arn:aws:iam::aws:policy/AmazonAthenaFullAccess",
