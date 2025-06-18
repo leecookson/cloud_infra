@@ -33,16 +33,10 @@ jobs:
           name: Log-into-AWS
           command: |
             aws s3 ls --profile "OIDC-PROFILE"
-  tf-setup:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - run:
-          name: Clone TF Scripts repository
-          command: git clone ${TF_SCRIPTS_REPO} ~/tfscripts
   tf-plan:
     executor: gcp-cli/default
     steps:
+      - tf-scripts/install_scripts
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
