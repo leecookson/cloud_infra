@@ -60,9 +60,12 @@ workflows:
   verify-gcp-oidc-access:
     jobs:
       - gcp-init
-  gcp-plan:
-    jobs:
-      - tf-plan
   verify-aws-oidc-access:
     jobs:
       - aws-init
+  gcp-plan:
+    jobs:
+      - gcp-tf-plan
+  aws-plan:
+    jobs:
+      - aws-tf-plan
