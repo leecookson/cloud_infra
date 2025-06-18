@@ -25,9 +25,9 @@ jobs:
       - checkout
       # run the aws-cli/setup command from the orb
       - aws-cli/setup:
-          profile_name: oidc-profile
-          role_arn: arn:aws:iam::021874127869:role/circle_ci_deploy
-          role_session_name: oidc-session
+          profile_name: "oidc-profile"
+          role_arn: "arn:aws:iam::021874127869:role/circle_ci_deploy"
+          role_session_name: "oidc-session"
           session_duration: "1800"
       - run:
           name: Log-into-AWS
