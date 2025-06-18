@@ -36,11 +36,11 @@ jobs:
   tf-plan:
     executor: gcp-cli/default
     steps:
-      - tf-scripts/install_tf_scripts_to_path
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
+      - tf-scripts/install
       - run:
           command: which tfplan;tfplan gcp
 # Orchestrate our job run sequence
