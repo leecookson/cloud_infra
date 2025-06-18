@@ -36,7 +36,7 @@ jobs:
   tf-plan:
     executor: gcp-cli/default
     steps:
-      - tf-scripts/install_scripts
+      - tf-scripts/install_tf_scripts_to_path
       - checkout
       - gcp-cli/setup:
           version: 404.0.0
