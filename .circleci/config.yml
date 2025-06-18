@@ -50,10 +50,7 @@ workflows:
       - gcp-init
   gcp-plan:
     jobs:
-      - tf-setup
-      - tf-plan:
-          requires:
-            - tf-setup
+      - tf-plan
   verify-aws-oidc-access:
     jobs:
       - aws-init
