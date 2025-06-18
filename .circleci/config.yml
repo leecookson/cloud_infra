@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Log-into-AWS
           command: |
-            aws s3 ls --profile "OIDC-PROFILE"
+            aws s3 ls --profile "oidc-profile"
   tf-plan:
     executor: gcp-cli/default
     steps:
