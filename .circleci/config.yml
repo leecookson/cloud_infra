@@ -48,10 +48,10 @@ jobs:
     executor: azure-cli/default
     steps:
       - checkout
-      - azure-cli/install
+      - azure-cli/login-with-service-principal
       - run:
-          command: az -v
-          name: Verify Azure CLI is installed
+          command: az resource list
+          name: List resources of tenant stored as `AZURE_SP_TENANT` env var
   gcp-tf-plan:
     executor: gcp-cli/default
     steps:
@@ -135,7 +135,7 @@ workflows:
         - equal: [apply, << pipeline.parameters.action >>]
         - eaual: [gcp, << pipeline.parameters.platform >>]
     jobs:
-      - gcp-tf-plan
+      - gcp-tf-apply
   aws-plan:
     when:
       and:
@@ -149,7 +149,7 @@ workflows:
         - equal: [apply, << pipeline.parameters.action >>]
         - eaual: [aws, << pipeline.parameters.platform >>]
     jobs:
-      - aws-tf-plan
+      - aws-tf-apply
   azure-install:
     jobs:
       - azure-init
