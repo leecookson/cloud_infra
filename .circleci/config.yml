@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   gcp-cli: circleci/gcp-cli@3.3.1
   aws-cli: circleci/aws-cli@5.4.0
+  azure-cli: circleci/azure-cli@1.3.2
   tf-scripts: leecookson/tf-scripts-orb@dev:first
 
 parameters:
@@ -43,6 +44,14 @@ jobs:
           name: Log-into-AWS
           command: |
             aws s3 ls --profile "oidc-profile"
+  azure-init:
+    executor: azure-cli/default
+    steps:
+      - checkout
+      - azure-cli/install
+      - run:
+          command: az -v
+          name: Verify Azure CLI is installed
   gcp-tf-plan:
     executor: gcp-cli/default
     steps:
@@ -131,3 +140,6 @@ workflows:
           equal: "aws"
     jobs:
       - aws-tf-plan
+  azure-install:
+    jobs:
+      - azure-init
