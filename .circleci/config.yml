@@ -125,15 +125,15 @@ workflows:
   gcp-plan:
     when:
       and:
-        - equal: [plan, << parameters.action >>]
-        - eaual: [gcp, << parameters.platform >>]
+        - equal: [plan, << pipeline.parameters.action >>]
+        - eaual: [gcp, << pipeline.parameters.platform >>]
     jobs:
       - gcp-tf-plan
   gcp-apply:
     when:
       and:
-        - equal: [apply, << parameters.action >>]
-        - eaual: [gcp, << parameters.platform >>]
+        - equal: [apply, << pipeline.parameters.action >>]
+        - eaual: [gcp, << pipeline.parameters.platform >>]
     jobs:
       - gcp-tf-plan
   aws-plan:
