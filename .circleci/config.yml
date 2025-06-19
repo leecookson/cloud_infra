@@ -47,7 +47,8 @@ jobs:
           use_oidc: true
       - tf-scripts/install
       - run:
-          command: which tfplan;tfplan gcp
+          name: Terraform Plan
+          command: tfplan gcp
   aws-tf-plan:
     executor: aws-cli/default
     steps:
@@ -64,7 +65,8 @@ jobs:
           session_duration: "1800"
       - tf-scripts/install
       - run:
-          command: which tfplan;tfplan aws
+          name: Terraform Plan
+          command: tfplan aws
 # Orchestrate our job run sequence
 workflows:
   gcp-plan:

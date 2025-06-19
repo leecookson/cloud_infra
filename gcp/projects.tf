@@ -19,7 +19,8 @@ variable "gcp_service_list" {
     "cloudresourcemanager.googleapis.com",
     "compute.googleapis.com",
     "certificatemanager.googleapis.com",
-    "networkservices.googleapis.com"
+    "networkservices.googleapis.com",
+    "serviceusage.googleapis.com"
   ]
 }
 
