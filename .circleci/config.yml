@@ -125,19 +125,29 @@ workflows:
   gcp-plan:
     when:
       and:
-        - <<: << pipeline.parameters.action >>
-          equal: "plan"
-        - <<: << pipeline.parameters.platform>>
-          equal: "gcp"
+        - equal: [plan, << parameters.action >>]
+        - eaual: [gcp, << parameters.platform >>]
+    jobs:
+      - gcp-tf-plan
+  gcp-apply:
+    when:
+      and:
+        - equal: [apply, << parameters.action >>]
+        - eaual: [gcp, << parameters.platform >>]
     jobs:
       - gcp-tf-plan
   aws-plan:
     when:
       and:
-        - <<: << pipeline.parameters.action >>
-          equal: "plan"
-        - <<: << pipeline.parameters.platform>>
-          equal: "aws"
+        - equal: [apply, << pipeline.parameters.action >>]
+        - eaual: [aws, << pipeline.parameters.platform >>]
+    jobs:
+      - aws-tf-plan
+  aws-apply:
+    when:
+      and:
+        - equal: [apply, << pipeline.parameters.action >>]
+        - eaual: [aws, << pipeline.parameters.platform >>]
     jobs:
       - aws-tf-plan
   azure-install:
