@@ -5,6 +5,16 @@ orbs:
   aws-cli: circleci/aws-cli@5.4.0
   tf-scripts: leecookson/tf-scripts-orb@dev:first
 
+parameters:
+  action:
+    type: enum
+    enum: [plan, apply]
+    default: plan
+  platform:
+    type: enum
+    enum: [aws, azure, gcp]
+    default: aws
+
 jobs:
   gcp-init:
     executor: gcp-cli/default
@@ -49,6 +59,22 @@ jobs:
       - run:
           name: Terraform Plan
           command: tfplan gcp
+  gcp-tf-apply:
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup:
+          profile_name: "s3-backend"
+          role_arn: "arn:aws:iam::021874127869:role/s3_backend"
+          role_session_name: "s3-backend"
+          session_duration: "1800"
+      - gcp-cli/setup:
+          version: 404.0.0
+          use_oidc: true
+      - tf-scripts/install
+      - run:
+          name: Terraform Plan
+          command: tfapply gcp
   aws-tf-plan:
     executor: aws-cli/default
     steps:
@@ -67,11 +93,41 @@ jobs:
       - run:
           name: Terraform Plan
           command: tfplan aws
+  aws-tf-apply:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - aws-cli/setup:
+          profile_name: "s3-backend"
+          role_arn: "arn:aws:iam::021874127869:role/s3_backend"
+          role_session_name: "s3-backend"
+          session_duration: "1800"
+      - aws-cli/setup:
+          profile_name: "oidc-profile"
+          role_arn: "arn:aws:iam::021874127869:role/circle_ci_deploy"
+          role_session_name: "oidc-session"
+          session_duration: "1800"
+      - tf-scripts/install
+      - run:
+          name: Terraform Plan
+          command: tfapply aws
 # Orchestrate our job run sequence
 workflows:
   gcp-plan:
+    when:
+      and:
+        - <<: << pipeline.parameters.action >>
+          equal: "plan"
+        - <<: << pipeline.parameters.platform>>
+          equal: "gcp"
     jobs:
       - gcp-tf-plan
   aws-plan:
+    when:
+      and:
+        - <<: << pipeline.parameters.action >>
+          equal: "plan"
+        - <<: << pipeline.parameters.platform>>
+          equal: "aws"
     jobs:
       - aws-tf-plan
