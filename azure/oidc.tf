@@ -31,7 +31,7 @@ resource "azuread_application_federated_identity_credential" "circleci_oidc" {
   application_id = "/applications/${azuread_application.circleci.object_id}"
   display_name   = "circleci-oidc"
   issuer         = "https://oidc.circleci.com/org/${var.circleci_org_uuid}"
-  subject        = "org/${var.circleci_org_uuid}"
+  subject        = "org/${var.circleci_org_uuid}/project/${var.circleci_project_uuid}/user/${var.circleci_user_uuid}"
   audiences      = ["api://AzureADTokenExchange"]
 }
 
@@ -62,4 +62,9 @@ output "federated_subject" {
 output "tenant_id" {
   description = "Tenant ID configured in Azure"
   value       = data.azuread_client_config.current.tenant_id
+}
+
+output "service_principal" {
+  description = "Azure Service Pricipal"
+  value       = azuread_service_principal.circleci.id
 }
