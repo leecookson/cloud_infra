@@ -166,41 +166,41 @@ workflows:
     when:
       and:
         - equal: [plan, << pipeline.parameters.action >>]
-        - eaual: [azure, << pipeline.parameters.platform >>]
+        - equal: [azure, << pipeline.parameters.platform >>]
     jobs:
       - azure-tf-plan
   gcp-plan:
     when:
       and:
         - equal: [plan, << pipeline.parameters.action >>]
-        - eaual: [gcp, << pipeline.parameters.platform >>]
+        - equal: [gcp, << pipeline.parameters.platform >>]
     jobs:
       - gcp-tf-plan
   gcp-apply:
     when:
       and:
         - equal: [apply, << pipeline.parameters.action >>]
-        - eaual: [gcp, << pipeline.parameters.platform >>]
+        - equal: [gcp, << pipeline.parameters.platform >>]
     jobs:
       - gcp-tf-apply
   aws-plan:
     when:
       and:
         - equal: [apply, << pipeline.parameters.action >>]
-        - eaual: [aws, << pipeline.parameters.platform >>]
+        - equal: [aws, << pipeline.parameters.platform >>]
     jobs:
       - aws-tf-plan
   aws-apply:
     when:
       and:
         - equal: [apply, << pipeline.parameters.action >>]
-        - eaual: [aws, << pipeline.parameters.platform >>]
+        - equal: [aws, << pipeline.parameters.platform >>]
     jobs:
       - aws-tf-apply
   azure-apply:
     when:
       and:
         - equal: [apply, << pipeline.parameters.action >>]
-        - eaual: [azure, << pipeline.parameters.platform >>]
+        - equal: [azure, << pipeline.parameters.platform >>]
     jobs:
       - azure-tf-apply
