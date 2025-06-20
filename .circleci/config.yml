@@ -133,8 +133,13 @@ jobs:
   azure-tf-plan:
     executor: azure-cli/default
     steps:
-      - azure-cli/install
       - checkout
+      - aws-cli/setup:
+          profile_name: "s3-backend"
+          role_arn: "arn:aws:iam::021874127869:role/s3_backend"
+          role_session_name: "s3-backend"
+          session_duration: "1800"
+      - azure-cli/install
       - run:
           name: Login to Azure using OIDC
           command: |
@@ -149,8 +154,13 @@ jobs:
   azure-tf-apply:
     executor: azure-cli/default
     steps:
-      - azure-cli/install
       - checkout
+      - aws-cli/setup:
+          profile_name: "s3-backend"
+          role_arn: "arn:aws:iam::021874127869:role/s3_backend"
+          role_session_name: "s3-backend"
+          session_duration: "1800"
+      - azure-cli/install
       - run:
           name: Login to Azure using OIDC
           command: |
