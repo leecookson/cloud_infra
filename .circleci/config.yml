@@ -29,7 +29,6 @@ jobs:
           command: |
             echo "Running deployment commands...."
             gcloud iam workload-identity-pools list --location=global
-
   aws-init:
     executor: aws-cli/default
     steps:
@@ -152,7 +151,7 @@ jobs:
       - run:
           name: Terraform Plan
           command: tfplan azure
-  aws-tf-apply:
+  azure-tf-apply:
     executor: azure-cli/azure-docker
     steps:
       - checkout
