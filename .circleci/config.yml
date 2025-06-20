@@ -51,14 +51,16 @@ jobs:
       - run:
           name: Login to Azure using OIDC
           command: |
+            circleci run oidc get --claims '{"aud": "api://AzureADTokenExchange"}'
+
             echo CIRCLE_OIDC_TOKEN
             echo ${CIRCLE_OIDC_TOKEN} | base64
             echo ${AZURE_TENANT_ID}
             echo ${AZURE_CLIENT_ID}
             az login --federated-token "$CIRCLE_OIDC_TOKEN" \
-                     --service-principal \
-                     --username "$AZURE_CLIENT_ID" \
-                     --tenant "$AZURE_TENANT_ID"
+                    --service-principal \
+                    --username "$AZURE_CLIENT_ID" \
+                    --tenant "$AZURE_TENANT_ID"
       - run:
           command: az resource list
   gcp-tf-plan:
@@ -129,6 +131,48 @@ jobs:
       - run:
           name: Terraform Plan
           command: tfapply aws
+  azure-tf-plan:
+    executor: azure-cli/azure-docker
+    steps:
+      - checkout
+      - run:
+          name: Login to Azure using OIDC
+          command: |
+            circleci run oidc get --claims '{"aud": "api://AzureADTokenExchange"}'
+
+            echo CIRCLE_OIDC_TOKEN
+            echo ${CIRCLE_OIDC_TOKEN} | base64
+            echo ${AZURE_TENANT_ID}
+            echo ${AZURE_CLIENT_ID}
+            az login --federated-token "$CIRCLE_OIDC_TOKEN" \
+                    --service-principal \
+                    --username "$AZURE_CLIENT_ID" \
+                    --tenant "$AZURE_TENANT_ID"
+      - tf-scripts/install
+      - run:
+          name: Terraform Plan
+          command: tfplan azure
+  aws-tf-apply:
+    executor: azure-cli/azure-docker
+    steps:
+      - checkout
+      - run:
+          name: Login to Azure using OIDC
+          command: |
+            circleci run oidc get --claims '{"aud": "api://AzureADTokenExchange"}'
+
+            echo CIRCLE_OIDC_TOKEN
+            echo ${CIRCLE_OIDC_TOKEN} | base64
+            echo ${AZURE_TENANT_ID}
+            echo ${AZURE_CLIENT_ID}
+            az login --federated-token "$CIRCLE_OIDC_TOKEN" \
+                    --service-principal \
+                    --username "$AZURE_CLIENT_ID" \
+                    --tenant "$AZURE_TENANT_ID"
+      - tf-scripts/install
+      - run:
+          name: Terraform Plan
+          command: tfapply azure
 # Orchestrate our job run sequence
 workflows:
   gcp-plan:
@@ -159,6 +203,17 @@ workflows:
         - eaual: [aws, << pipeline.parameters.platform >>]
     jobs:
       - aws-tf-apply
-  azure-install:
+  azure-plan:
+    when:
+      and:
+        - equal: [apply, << pipeline.parameters.action >>]
+        - eaual: [azure, << pipeline.parameters.platform >>]
     jobs:
-      - azure-init
+      - azure-tf-plan
+  azure-apply:
+    when:
+      and:
+        - equal: [apply, << pipeline.parameters.action >>]
+        - eaual: [azure, << pipeline.parameters.platform >>]
+    jobs:
+      - azure-tf-apply
