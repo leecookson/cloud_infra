@@ -137,12 +137,6 @@ jobs:
       - run:
           name: Login to Azure using OIDC
           command: |
-            circleci run oidc get --claims '{"aud": "api://AzureADTokenExchange"}'
-
-            echo CIRCLE_OIDC_TOKEN
-            echo ${CIRCLE_OIDC_TOKEN} | base64
-            echo ${AZURE_TENANT_ID}
-            echo ${AZURE_CLIENT_ID}
             az login --federated-token "$CIRCLE_OIDC_TOKEN" \
                     --service-principal \
                     --username "$AZURE_CLIENT_ID" \
@@ -158,12 +152,6 @@ jobs:
       - run:
           name: Login to Azure using OIDC
           command: |
-            circleci run oidc get --claims '{"aud": "api://AzureADTokenExchange"}'
-
-            echo CIRCLE_OIDC_TOKEN
-            echo ${CIRCLE_OIDC_TOKEN} | base64
-            echo ${AZURE_TENANT_ID}
-            echo ${AZURE_CLIENT_ID}
             az login --federated-token "$CIRCLE_OIDC_TOKEN" \
                     --service-principal \
                     --username "$AZURE_CLIENT_ID" \
