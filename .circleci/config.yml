@@ -44,7 +44,7 @@ jobs:
           command: |
             aws s3 ls --profile "oidc-profile"
   azure-init:
-    executor: azure-cli/azure-docker
+    executor: azure-cli/default
     steps:
       - checkout
       - run:
@@ -133,6 +133,7 @@ jobs:
   azure-tf-plan:
     executor: azure-cli/default
     steps:
+      - azure-cli/install
       - checkout
       - run:
           name: Login to Azure using OIDC
@@ -148,6 +149,7 @@ jobs:
   azure-tf-apply:
     executor: azure-cli/default
     steps:
+      - azure-cli/install
       - checkout
       - run:
           name: Login to Azure using OIDC
