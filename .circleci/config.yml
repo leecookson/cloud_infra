@@ -13,7 +13,7 @@ parameters:
     default: plan
   platform:
     type: enum
-    enum: [aws, azure, gcp]
+    enum: [gcp, aws, azure]
     default: aws
 
 jobs:
