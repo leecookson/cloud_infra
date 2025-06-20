@@ -48,10 +48,15 @@ jobs:
     executor: azure-cli/azure-docker
     steps:
       - checkout
-      - azure-cli/login-with-service-principal
+      - run:
+          name: Login to Azure using OIDC
+          command: |
+            az login --federated-token "$CIRCLE_OIDC_TOKEN" \
+                     --service-principal \
+                     --username "$AZURE_CLIENT_ID" \
+                     --tenant "$AZURE_TENANT_ID"
       - run:
           command: az resource list
-          name: List resources of tenant stored as `AZURE_SP_TENANT` env var
   gcp-tf-plan:
     executor: gcp-cli/default
     steps:
