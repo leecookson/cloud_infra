@@ -51,7 +51,8 @@ jobs:
       - run:
           name: Login to Azure using OIDC
           command: |
-            echo ${CIRCLE_OIDC_TOKEN}
+            echo CIRCLE_OIDC_TOKEN
+            echo ${CIRCLE_OIDC_TOKEN} | base64
             echo ${AZURE_TENANT_ID}
             echo ${AZURE_CLIENT_ID}
             az login --federated-token "$CIRCLE_OIDC_TOKEN" \
