@@ -32,7 +32,7 @@ resource "azuread_application_federated_identity_credential" "circleci_oidc" {
   display_name   = "circleci-oidc"
   issuer         = "https://oidc.circleci.com/org/${var.circleci_org_uuid}"
   subject        = "org/${var.circleci_org_uuid}/project/${var.circleci_project_uuid}/user/${var.circleci_user_uuid}"
-  audiences      = ["api://AzureADTokenExchange"]
+  audiences      = [var.circleci_org_uuid]
 }
 
 # az role assignment create \
