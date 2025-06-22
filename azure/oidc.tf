@@ -40,8 +40,14 @@ resource "azuread_application_federated_identity_credential" "circleci_oidc" {
 #   --role "Contributor" \
 #   --scope /subscriptions/<subscription-id>/resourceGroups/<your-rg>
 resource "azurerm_role_assignment" "circleci_contributor" {
-  scope                = data.azurerm_resource_group.current.id
+  scope                = data.azurerm_subscription.current.id
   role_definition_name = "Contributor"
+  principal_id         = split("/", azuread_service_principal.circleci.id)[2]
+}
+
+resource "azurerm_role_assignment" "circleci_azuread_reader" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Domain Services Contributor"
   principal_id         = split("/", azuread_service_principal.circleci.id)[2]
 }
 

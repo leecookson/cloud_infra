@@ -1,3 +1,7 @@
+variables "azure_subscription_id" {
+  type = string
+}
+
 variable "circleci_org_uuid" {
   type = string
 }
