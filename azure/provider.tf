@@ -15,5 +15,6 @@ terraform {
 # export ARM_SUBSCRIPTION_ID=159f2485-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 # export ARM_TENANT_ID=72f988bf-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 provider "azurerm" {
+  subscription_id = var.azure_subscription_id
   features {}
 }
