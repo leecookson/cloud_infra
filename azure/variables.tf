@@ -1,4 +1,4 @@
-variables "azure_subscription_id" {
+variable "azure_subscription_id" {
   type = string
 }
 
