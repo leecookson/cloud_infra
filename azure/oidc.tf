@@ -9,14 +9,16 @@ data "azurerm_resource_group" "current" {
 # az ad sp create-for-rbac --name "circleci-sp" --skip-assignment
 resource "azuread_application" "circleci" {
   display_name = "circleci-oidc-app"
-  owners       = [data.azuread_client_config.current.object_id]
+  owners = [
+    var.azure_owner_id
+  ]
 }
 
 resource "azuread_service_principal" "circleci" {
   client_id                    = azuread_application.circleci.client_id
   app_role_assignment_required = false
   owners = [
-    data.azuread_client_config.current.object_id
+    var.azure_owner_id
   ]
 }
 
