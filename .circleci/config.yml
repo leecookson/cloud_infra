@@ -20,6 +20,9 @@ jobs:
   gcp-tf-plan:
     executor: gcp-cli/default
     steps:
+      - tf-scripts/install
+      - tf-scripts/setup_backend:
+          iam_role_arn: "arn:aws:iam::021874127869:role/circle_ci_deploy"
       - checkout
       - aws-cli/setup:
           profile_name: "s3-backend"
@@ -29,7 +32,6 @@ jobs:
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
-      - tf-scripts/install
       - run:
           name: Terraform Plan
           command: tfplan gcp
