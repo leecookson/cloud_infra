@@ -129,6 +129,7 @@ jobs:
       - run:
           name: Terraform Plan
           command: tfapply azure
+
 # Orchestrate our job run sequence
 workflows:
   azure-plan:
@@ -137,7 +138,7 @@ workflows:
         - equal: [plan, << pipeline.parameters.action >>]
         - equal: [azure, << pipeline.parameters.platform >>]
     jobs:
-      - azure-tf-plan
+      - tf-scripts/azure-tf-plan
   gcp-plan:
     when:
       and:
