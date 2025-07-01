@@ -104,6 +104,18 @@ resource "aws_iam_role" "s3_backend" {
       {
         "Effect" : "Allow",
         "Principal" : {
+          "Federated" : "arn:aws:iam::021874127869:oidc-provider/gitlab.com"
+        },
+        "Action" : "sts:AssumeRoleWithWebIdentity",
+        "Condition" : {
+          "StringLike" : {
+            "gitlab.com:sub" : "group/cookson-group/*"
+          }
+        }
+      },
+      {
+        "Effect" : "Allow",
+        "Principal" : {
           "AWS" : "${aws_iam_user.terraform.arn}"
         },
         "Action" : "sts:AssumeRole"
