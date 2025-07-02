@@ -75,9 +75,12 @@ gcp-auth:
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
   script:
     - |
       echo ${GITLAB_OIDC_TOKEN} > /tmp/gitlab-oidc-token
+      cat /tmp/gitlab-oidc-token
       gcloud auth login --cred-file=/tmp/gitlab-oidc-token
 
 azure-auth:
