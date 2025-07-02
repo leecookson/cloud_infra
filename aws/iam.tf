@@ -92,7 +92,7 @@ resource "aws_iam_role" "s3_backend" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Federated" : "arn:aws:iam::021874127869:oidc-provider/oidc.circleci.com/org/${var.circleci_org_uuid}"
+          "Federated" : "${module.circleci-oidc-provider.oidc_provider_arn}"
         },
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
@@ -104,12 +104,14 @@ resource "aws_iam_role" "s3_backend" {
       {
         "Effect" : "Allow",
         "Principal" : {
-          "Federated" : "arn:aws:iam::021874127869:oidc-provider/gitlab.com"
+          "Federated" : "${module.gitlab-oidc-provider.oidc_provider_arn}"
         },
         "Action" : "sts:AssumeRoleWithWebIdentity",
         "Condition" : {
           "StringLike" : {
-            "gitlab.com:sub" : "group/cookson-group/*"
+            "gitlab.com:sub" : [
+              "project_path:leecookson-group/*"
+            ]
           }
         }
       },
