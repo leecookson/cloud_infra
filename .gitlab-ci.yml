@@ -80,7 +80,7 @@ gcp-auth:
   script:
     - |
       echo ${GITLAB_OIDC_TOKEN} > /tmp/gitlab-oidc-token
-      cat /tmp/gitlab-oidc-token
+      base64 < /tmp/gitlab-oidc-token
       gcloud auth login --cred-file=/tmp/gitlab-oidc-token
 
 azure-auth:
