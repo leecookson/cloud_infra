@@ -1,0 +1,192 @@
+spec:
+  inputs:
+    ACTION:
+      type: string
+      default: plan
+    PLATFORM:
+      type: string
+      default: aws
+    ALLPLANS:
+      type: boolean
+      default: false
+---
+stages:
+  - auth
+  - plan
+  - apply
+
+variables:
+  # AWS IAM Configuration
+  AWS_S3_BACKEND_ROLE: "arn:aws:iam::021874127869:role/s3_backend"
+  AWS_DEPLOY_ROLE: "arn:aws:iam::021874127869:role/gitlab-oidc-provider-aws"
+  AWS_CLI_INT_SESSION_DURATION: 3600
+  # AZURE IAM Configuration
+  AZURE_CLIENT_ID: "f0c3b1d2-4e56-4b7c-8d2f-1e2a3b4c5d6e"
+  AZURE_TENANT_ID: "b1c2d34e5-6f7g-8h9i-0j1k2l3m4n5o"
+
+  # GCP Configuration
+  GCP_CLI_VERSION: "404.0.0"
+
+# S3 backend setup job
+s3-backend:
+  stage: auth
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  script:
+    - |
+      export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+      echo ${AWS_CLI_INT_SESSION_DURATION}
+
+      mkdir -p ~/.aws
+      echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
+      aws configure set --profile s3-backend web_identity_token_file /tmp/web_identity_token
+      aws configure set --profile s3-backend role_arn $AWS_S3_BACKEND_ROLE
+      aws configure set --profile s3-backend region us-east-1
+      cat ~/.aws/config
+      aws sts get-caller-identity --profile s3-backend
+
+aws-auth:
+  stage: auth
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  script:
+    - |
+      # Setup AWS CLI for deployment
+
+      mkdir -p ~/.aws
+      echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
+      aws configure set --profile oidc-profile web_identity_token_file /tmp/web_identity_token
+      aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
+      aws configure set --profile oidc-profile region us-east-1
+      cat ~/.aws/config
+      aws sts get-caller-identity --profile oidc-profile
+
+gcp-auth:
+  stage: auth
+  image: google/cloud-sdk:$GCP_CLI_VERSION-alpine
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  script:
+    - |
+      echo ${GITLAB_OIDC_TOKEN} > /tmp/gitlab-oidc-token
+      gcloud auth login --cred-file=/tmp/gitlab-oidc-token
+
+azure-auth:
+  stage: auth
+  image: mcr.microsoft.com/azure-cli:latest
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  script:
+    - |
+      az login --federated-token ${GITLAB_OIDC_TOKEN} \
+        --service-principal \
+        --username "$AZURE_CLIENT_ID" \
+        --tenant "$AZURE_TENANT_ID"
+
+# GCP Jobs
+gcp-tf-plan:
+  stage: plan
+  image: google/cloud-sdk:$GCP_CLI_VERSION-alpine
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "gcp-auth"]
+  script:
+    - tfplan gcp
+  rules:
+    - if: $ALLPLANS == "true"
+    - if: $ACTION == "plan" && $PLATFORM == "gcp"
+
+gcp-tf-apply:
+  stage: apply
+  image: google/cloud-sdk:$GCP_CLI_VERSION-alpine
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "gcp-auth"]
+  script:
+    - tfapply gcp
+  rules:
+    - if: $ACTION == "apply" && $PLATFORM == "gcp"
+
+# AWS Jobs
+aws-tf-plan:
+  stage: plan
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "aws-auth"]
+  script:
+    - tfplan aws
+  rules:
+    - if: $ALLPLANS == "true"
+    - if: $ACTION == "plan" && $PLATFORM == "aws"
+
+aws-tf-apply:
+  stage: apply
+  image:
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "aws-auth"]
+  script:
+    - tfapply aws
+  rules:
+    - if: $ACTION == "apply" && $PLATFORM == "aws"
+
+# Azure Jobs
+azure-tf-plan:
+  stage: plan
+  image: mcr.microsoft.com/azure-cli:latest
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "azure-auth"]
+  script:
+    - tfplan azure
+  rules:
+    - if: $ALLPLANS == "true"
+    - if: $ACTION == "plan" && $PLATFORM == "azure"
+
+azure-tf-apply:
+  stage: apply
+  image: mcr.microsoft.com/azure-cli:latest
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  needs: ["s3-backend", "azure-auth"]
+  script:
+    - tfapply azure
+  rules:
+    - if: $ACTION == "apply" && $PLATFORM == "azure"
+
+# Reusable script templates
+.install_tf_scripts: &install_tf_scripts
+  - |
+    # Install terraform deps and git
+    yum install -q -y yum-utils shadow-utils git wget gpg
+    yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    yum -q -y install terraform
+
+    # Install tf-scripts
+    git clone https://gitlab.com/leecookson-group/tf-scripts.git /tmp/tf-scripts
+
+    export PATH="/tmp/tf-scripts/bin:$PATH"
+    # Make scripts executable
+    chmod +x /tmp/tf-scripts/bin/*
+    ls -lta /tmp/tf-scripts/bin
