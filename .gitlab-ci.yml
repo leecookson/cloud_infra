@@ -80,6 +80,7 @@ gcp-auth:
   script:
     - |
       set -x
+      apk add wget jq
       echo ${GITLAB_OIDC_TOKEN} > /tmp/gitlab-oidc-token
       ls -ltr /tmp/gitlab-oidc-token
       jq < /tmp/gitlab-oidc-token | head -1
