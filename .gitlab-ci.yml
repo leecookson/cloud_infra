@@ -71,8 +71,6 @@ aws-auth:
 
 gcp-auth:
   stage: auth
-  tags:
-    - macos
   image: google/cloud-sdk:$GCP_CLI_VERSION-alpine
   id_tokens:
     GITLAB_OIDC_TOKEN:
@@ -81,7 +79,9 @@ gcp-auth:
     - if: $CI_PIPELINE_SOURCE == "push"
   script:
     - |
+      set -x
       echo ${GITLAB_OIDC_TOKEN} > /tmp/gitlab-oidc-token
+      ls -ltr /tmp/gitlab-oidc-token
       jq < /tmp/gitlab-oidc-token | head -1
       gcloud auth login --cred-file=/tmp/gitlab-oidc-token
 
