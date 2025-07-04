@@ -118,7 +118,7 @@ gcp-tf-apply:
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
-  needs: ["s3-backend", "gcp-auth"]
+  needs: ["s3-backend", "gcloud:auth"]
   script:
     - tfapply gcp
   rules:
