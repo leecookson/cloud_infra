@@ -35,7 +35,7 @@ variables:
   GCP_CLI_VERSION: "404.0.0"
 
 include:
-  - component: $CI_SERVER_FQDN/slacorte/devops/cicd/components/gcp-openid-connect/oidc@1.0.0
+  - component: $CI_SERVER_FQDN/slacorte/devops/cicd/components/gcp-openid-connect/oidc@v1.0.0
     inputs:
       gcp_pool_id: $OIDC_WIP_ID
       gcp_project_number: $GOOGLE_PROJECT_NUMBER
