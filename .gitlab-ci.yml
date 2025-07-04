@@ -44,7 +44,7 @@ include:
       gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
 
 default:
-  image: triple-cloud-image/tf-deployer
+  image: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
 
 # S3 backend setup job
 s3-backend:
