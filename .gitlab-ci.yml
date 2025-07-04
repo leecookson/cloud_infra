@@ -45,6 +45,8 @@ include:
 
 default:
   image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 # S3 backend setup job
 s3-backend:
