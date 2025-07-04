@@ -85,15 +85,6 @@ aws-auth:
       cat ~/.aws/config
       aws sts get-caller-identity --profile oidc-profile
 
-gcp-auth:
-  stage: auth
-  needs: [gcloud:auth]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
-  script:
-    - |
-      gcloud projects list --filter="projectId:$GOOGLE_PROJECT_ID" --format="table(projectId,name)"
-
 azure-auth:
   stage: auth
   image: mcr.microsoft.com/azure-cli:latest
@@ -111,10 +102,13 @@ azure-auth:
 gcp-tf-plan:
   stage: plan
   image: google/cloud-sdk:$GCP_CLI_VERSION-alpine
-  needs: ["s3-backend", "gcp-auth"]
+  needs: ["s3-backend", "gcloud:auth"]
   script:
-    - tfplan gcp
+    - |
+      gcloud projects list --filter="projectId:$GOOGLE_PROJECT_ID" --format="table(projectId,name)"
+      tfplan gcp
   rules:
+    - if: $CI_PIPELINE_SOURCE == "push"
     - if: $ALLPLANS == "true"
     - if: $ACTION == "plan" && $PLATFORM == "gcp"
 
