@@ -105,7 +105,7 @@ gcp-tf-plan:
   needs: ["s3-backend", "gcloud:auth"]
   script:
     - |
-      gcloud projects list --filter="projectId:$GOOGLE_PROJECT_ID" --format="table(projectId,name)"
+      gcloud projects list --filter=projectId:$GOOGLE_PROJECT_ID --format="table(projectId,name)"
       tfplan gcp
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
