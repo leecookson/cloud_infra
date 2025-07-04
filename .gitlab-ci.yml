@@ -44,16 +44,13 @@ include:
       gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
 
 default:
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
+  image: $CI_REGISTRY/leecookson-images/triple-cloud-image/my-app:latest
   before_script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
 
 # S3 backend setup job
 s3-backend:
   stage: auth
-  image:
-    name: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
-    entrypoint: [""]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -72,9 +69,6 @@ s3-backend:
 
 aws-auth:
   stage: auth
-  image:
-    name: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
-    entrypoint: [""]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -92,7 +86,6 @@ aws-auth:
 
 azure-auth:
   stage: auth
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -106,7 +99,6 @@ azure-auth:
 # GCP Jobs
 gcp-tf-plan:
   stage: plan
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
   needs: ["s3-backend", "gcloud:auth"]
   script:
     - tfplan gcp
@@ -117,7 +109,6 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -130,9 +121,6 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  image:
-    name: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
-    entrypoint: [""]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -145,9 +133,6 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
-  image:
-    name: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
-    entrypoint: [""]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -160,7 +145,6 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -173,7 +157,6 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
-  image: registry.gitlab.com/leecookson-images/triple-cloud-image/my-app:latest
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
