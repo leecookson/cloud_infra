@@ -37,6 +37,7 @@ variables:
 include:
   - component: $CI_SERVER_FQDN/slacorte/devops/cicd/components/gcp-openid-connect/oidc@v1.0.0
     inputs:
+      stage: auth
       gcp_pool_id: $OIDC_WIP_ID
       gcp_project_number: $GOOGLE_PROJECT_NUMBER
       gcp_provider_id: $OIDC_WIP_PROVIDER_ID
