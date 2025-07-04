@@ -44,10 +44,7 @@ include:
       gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
 
 default:
-  image: $CI_REGISTRY/leecookson-images/triple-cloud-image/my-app:latest
-  before_script:
-    - echo $CI_JOB_TOKEN | docker login -u $CI_JOB_USER --password-stdin $CI_REGISTRY
-    - docker pull $CI_REGISTRY/group/other-repo/image:tag
+  image: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
 
 # S3 backend setup job
 s3-backend:
