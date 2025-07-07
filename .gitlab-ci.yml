@@ -21,8 +21,8 @@ variables:
   AWS_DEPLOY_ROLE: "arn:aws:iam::021874127869:role/gitlab-oidc-provider-aws"
   AWS_CLI_INT_SESSION_DURATION: 3600
   # AZURE IAM Configuration
-  AZURE_CLIENT_ID: "f0c3b1d2-4e56-4b7c-8d2f-1e2a3b4c5d6e"
-  AZURE_TENANT_ID: "b1c2d34e5-6f7g-8h9i-0j1k2l3m4n5o"
+  AZURE_CLIENT_ID: "17115c0b-d002-462d-a621-c10e8a81a6c0"
+  AZURE_TENANT_ID: "4cb96fd7-6da3-4b09-90a6-c2719089be65"
   # Google Cloud IAM Configuration
   GOOGLE_COMPUTE_REGION: "us-east1"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
