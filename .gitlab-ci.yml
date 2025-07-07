@@ -44,6 +44,11 @@ default:
     name: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
     entrypoint: [""]
 
+.id_tokens:
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+
 .backend_auth: &backend_auth
   - |
     export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -62,11 +67,11 @@ default:
     # Setup AWS CLI for deployment
 
     mkdir -p ~/.aws
-    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
-    aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
+    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_aws
+    aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token_aws
     aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
     aws configure set --profile oidc-profile region us-east-1
-    cat ~/.aws/config
+    # cat ~/.aws/config
     aws sts get-caller-identity --profile oidc-profile
 
 .azure-auth: &azure_auth
@@ -75,22 +80,23 @@ default:
       --service-principal \
       --username "$AZURE_CLIENT_ID" \
       --tenant "$AZURE_TENANT_ID"
+    az account show
 
+# based on https://gitlab.com/guided-explorations/gcp/configure-openid-connect-in-gcp/-/blob/main/.gitlab-ci.yml?ref_type=heads
 .gcp-auth: &gcp_auth
   - |
-    # Write the web_identity_token file with the JWT from $GITLAB_OIDC_TOKEN
-    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
-    gcloud auth login --brief --cred-file=${CI_PROJECT_DIR}/web_identity_token
-    gcloud config set project $GOOGLE_PROJECT_ID
-    gcloud config set compute/region $GOOGLE_COMPUTE_REGION
-    gcloud auth print-access-token
+    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_gcp
+    gcloud iam workload-identity-pools create-cred-config ${OIDC_WIP_PROVIDER_ID} \
+      --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
+      --output-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
+      --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp
+    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
+    gcloud auth list
 
 # GCP Jobs
 gcp-tf-plan:
   stage: plan
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *gcp_auth
@@ -104,9 +110,7 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *gcp_auth
@@ -118,9 +122,7 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *aws_auth
@@ -132,9 +134,7 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *aws_auth
@@ -146,9 +146,7 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *azure_auth
@@ -160,9 +158,7 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  extends: .id_tokens
   before_script:
     - *backend_auth
     - *azure_auth
