@@ -32,9 +32,9 @@ variables:
   GOOGLE_COMPUTE_REGION: "us-east1"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
   GOOGLE_PROJECT_NUMBER: "101607275339"
-  OIDC_SERVICE_ACCOUNT_EMAIL: "circleci-oidc-acct@cookson-pro-gcp.iam.gserviceaccount.com"
-  OIDC_WIP_PROVIDER_ID: "circleci-oidc-prv"
-  OIDC_WIP_ID: "circleci-oidc-pool"
+  OIDC_SERVICE_ACCOUNT_EMAIL: "gitlab-pipeline@cookson-pro-gcp.iam.gserviceaccount.com"
+  OIDC_WIP_PROVIDER_ID: "gitlab-com-oidc"
+  OIDC_WIP_ID: "gitlab-com"
 
   # GCP Configuration
   GCP_CLI_VERSION: "404.0.0"
