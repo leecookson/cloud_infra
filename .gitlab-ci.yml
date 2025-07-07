@@ -102,6 +102,7 @@ gcp-tf-plan:
   stage: plan
   needs: ["s3-backend", "gcloud:auth"]
   script:
+    - cat /root/.aws/config
     - tfplan gcp
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
