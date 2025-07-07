@@ -88,7 +88,7 @@ default:
 # GCP Jobs
 gcp-tf-plan:
   stage: plan
-  needs: ["s3-backend", "gcloud:auth"]
+  needs: ["gcloud:auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -118,7 +118,6 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  needs: ["aws-auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
