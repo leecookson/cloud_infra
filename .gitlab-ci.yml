@@ -39,15 +39,6 @@ variables:
   # GCP Configuration
   GCP_CLI_VERSION: "404.0.0"
 
-include:
-  - component: $CI_SERVER_FQDN/slacorte/devops/cicd/components/gcp-openid-connect/oidc@v1.0.0
-    inputs:
-      stage: auth
-      gcp_pool_id: $OIDC_WIP_ID
-      gcp_project_number: $GOOGLE_PROJECT_NUMBER
-      gcp_provider_id: $OIDC_WIP_PROVIDER_ID
-      gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
-
 default:
   image:
     name: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
@@ -85,15 +76,24 @@ default:
       --username "$AZURE_CLIENT_ID" \
       --tenant "$AZURE_TENANT_ID"
 
+.gcp-auth: &gcp_auth
+  - |
+    # Write the web_identity_token file with the JWT from $GITLAB_OIDC_TOKEN
+    echo "${GITLAB_OIDC_TOKEN}" > ${CI_PROJECT_DIR}/web_identity_token
+    gcloud auth login --brief --cred-file=${CI_PROJECT_DIR}/web_identity_token
+    gcloud config set project $GOOGLE_PROJECT_ID
+    gcloud config set compute/region $GOOGLE_COMPUTE_REGION
+    gcloud auth print-access-token
+
 # GCP Jobs
 gcp-tf-plan:
   stage: plan
-  needs: ["gcloud:auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
   before_script:
     - *backend_auth
+    - *gcp_auth
   script:
     - cat /root/.aws/config
     - tfplan gcp
@@ -104,12 +104,12 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  needs: ["gcloud:auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
   before_script:
     - *backend_auth
+    - *gcp_auth
   script:
     - tfapply gcp
   rules:
@@ -132,6 +132,9 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
   before_script:
     - *backend_auth
     - *aws_auth
@@ -143,6 +146,9 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
   before_script:
     - *backend_auth
     - *azure_auth
@@ -154,6 +160,9 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
   before_script:
     - *backend_auth
     - *azure_auth
