@@ -62,8 +62,8 @@ default:
     # Setup AWS CLI for deployment
 
     mkdir -p ~/.aws
-    echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
-    aws configure set --profile oidc-profile web_identity_token_file /tmp/web_identity_token
+    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
+    aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
     aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
     aws configure set --profile oidc-profile region us-east-1
     cat ~/.aws/config
@@ -79,7 +79,7 @@ default:
 .gcp-auth: &gcp_auth
   - |
     # Write the web_identity_token file with the JWT from $GITLAB_OIDC_TOKEN
-    echo "${GITLAB_OIDC_TOKEN}" > ${CI_PROJECT_DIR}/web_identity_token
+    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
     gcloud auth login --brief --cred-file=${CI_PROJECT_DIR}/web_identity_token
     gcloud config set project $GOOGLE_PROJECT_ID
     gcloud config set compute/region $GOOGLE_COMPUTE_REGION
