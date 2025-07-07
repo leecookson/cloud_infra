@@ -43,6 +43,11 @@ include:
       gcp_provider_id: $OIDC_WIP_PROVIDER_ID
       gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
 
+cache:
+  key: aws-profile
+  paths:
+    - ~/.aws
+
 default:
   image:
     name: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
@@ -54,6 +59,10 @@ s3-backend:
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   script:
     - |
       set -x
@@ -73,6 +82,10 @@ aws-auth:
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   script:
     - |
       # Setup AWS CLI for deployment
@@ -101,6 +114,10 @@ azure-auth:
 gcp-tf-plan:
   stage: plan
   needs: ["s3-backend", "gcloud:auth"]
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   script:
     - cat /root/.aws/config
     - tfplan gcp
@@ -111,9 +128,10 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   needs: ["s3-backend", "gcloud:auth"]
   script:
     - tfapply gcp
@@ -123,9 +141,10 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   needs: ["s3-backend", "aws-auth"]
   script:
     - tfplan aws
@@ -135,9 +154,10 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   needs: ["s3-backend", "aws-auth"]
   script:
     - tfapply aws
@@ -147,9 +167,10 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   needs: ["s3-backend", "azure-auth"]
   script:
     - tfplan azure
@@ -159,9 +180,10 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
+  cache:
+    key: aws-profile
+    paths:
+      - ~/.aws
   needs: ["s3-backend", "azure-auth"]
   script:
     - tfapply azure
