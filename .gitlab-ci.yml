@@ -20,9 +20,12 @@ variables:
   AWS_S3_BACKEND_ROLE: "arn:aws:iam::021874127869:role/s3_backend"
   AWS_DEPLOY_ROLE: "arn:aws:iam::021874127869:role/gitlab-oidc-provider-aws"
   AWS_CLI_INT_SESSION_DURATION: 3600
+
   # AZURE IAM Configuration
   AZURE_CLIENT_ID: "17115c0b-d002-462d-a621-c10e8a81a6c0"
   AZURE_TENANT_ID: "4cb96fd7-6da3-4b09-90a6-c2719089be65"
+  AZURE_SUBSCRIPTION_ID: "9db9c40a-cbe5-4efc-aacc-a9fa6414c592"
+
   # Google Cloud IAM Configuration
   GOOGLE_COMPUTE_REGION: "us-east1"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
