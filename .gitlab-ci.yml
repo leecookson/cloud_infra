@@ -17,6 +17,8 @@ stages:
 
 variables:
   # AWS IAM Configuration
+  AWS_DEFAULT_REGION: "us-east-1"
+  AWS_S3_BACKEND_BUCKET: "cookson-pro-terraform-state"
   AWS_S3_BACKEND_ROLE: "arn:aws:iam::021874127869:role/s3_backend"
   AWS_DEPLOY_ROLE: "arn:aws:iam::021874127869:role/gitlab-oidc-provider-aws"
   AWS_CLI_INT_SESSION_DURATION: 3600
@@ -46,82 +48,52 @@ include:
       gcp_provider_id: $OIDC_WIP_PROVIDER_ID
       gcp_service_account_email: $OIDC_SERVICE_ACCOUNT_EMAIL
 
-cache:
-  key: aws-profile
-  paths:
-    - /root/.aws/config
-
 default:
   image:
     name: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
     entrypoint: [""]
 
-# S3 backend setup job
-s3-backend:
-  stage: auth
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
-  script:
-    - |
-      set -x
-      export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
-      echo ${AWS_CLI_INT_SESSION_DURATION}
+.backend_auth: &backend_auth
+  - |
+    export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
-      echo "USER=${USER} USERNAME=${USERNAME} HOME=${HOME} CWD=${CWD}"
-      mkdir -p ~/.aws
-      echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
-      aws configure set --profile s3-backend web_identity_token_file /tmp/web_identity_token
-      aws configure set --profile s3-backend role_arn $AWS_S3_BACKEND_ROLE
-      aws configure set --profile s3-backend region us-east-1
-      cat ~/.aws/config
-      aws sts get-caller-identity --profile s3-backend
+    echo "USER=${USER} USERNAME=${USERNAME} HOME=${HOME} CWD=${CWD}"
+    mkdir -p ~/.aws
+    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
+    aws configure set --profile s3-backend web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
+    aws configure set --profile s3-backend role_arn $AWS_S3_BACKEND_ROLE
+    aws configure set --profile s3-backend region us-east-1
+    cat ~/.aws/config
+    aws sts get-caller-identity --profile s3-backend
 
-aws-auth:
-  stage: auth
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
-  script:
-    - |
-      # Setup AWS CLI for deployment
+.aws_auth: &aws_auth
+  - |
+    # Setup AWS CLI for deployment
 
-      mkdir -p ~/.aws
-      echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
-      aws configure set --profile oidc-profile web_identity_token_file /tmp/web_identity_token
-      aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
-      aws configure set --profile oidc-profile region us-east-1
-      cat ~/.aws/config
-      aws sts get-caller-identity --profile oidc-profile
+    mkdir -p ~/.aws
+    echo ${GITLAB_OIDC_TOKEN} > /tmp/web_identity_token
+    aws configure set --profile oidc-profile web_identity_token_file /tmp/web_identity_token
+    aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
+    aws configure set --profile oidc-profile region us-east-1
+    cat ~/.aws/config
+    aws sts get-caller-identity --profile oidc-profile
 
-azure-auth:
-  stage: auth
-  id_tokens:
-    GITLAB_OIDC_TOKEN:
-      aud: https://gitlab.com
-  script:
-    - |
-      az login --federated-token ${GITLAB_OIDC_TOKEN} \
-        --service-principal \
-        --username "$AZURE_CLIENT_ID" \
-        --tenant "$AZURE_TENANT_ID"
+.azure-auth: &azure_auth
+  - |
+    az login --federated-token ${GITLAB_OIDC_TOKEN} \
+      --service-principal \
+      --username "$AZURE_CLIENT_ID" \
+      --tenant "$AZURE_TENANT_ID"
 
 # GCP Jobs
 gcp-tf-plan:
   stage: plan
   needs: ["s3-backend", "gcloud:auth"]
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - *backend_auth
   script:
     - cat /root/.aws/config
     - tfplan gcp
@@ -132,11 +104,12 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
   needs: ["s3-backend", "gcloud:auth"]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - *backend_auth
   script:
     - tfapply gcp
   rules:
@@ -145,11 +118,13 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
   needs: ["s3-backend", "aws-auth"]
+  id_tokens:
+    GITLAB_OIDC_TOKEN:
+      aud: https://gitlab.com
+  before_script:
+    - *backend_auth
+    - *aws_auth
   script:
     - tfplan aws
   rules:
@@ -158,11 +133,10 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
   needs: ["s3-backend", "aws-auth"]
+  before_script:
+    - *backend_auth
+    - *aws_auth
   script:
     - tfapply aws
   rules:
@@ -171,11 +145,10 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
   needs: ["s3-backend", "azure-auth"]
+  before_script:
+    - *backend_auth
+    - *azure_auth
   script:
     - tfplan azure
   rules:
@@ -184,11 +157,10 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
-  cache:
-    key: aws-profile
-    paths:
-      - /root/.aws/config
   needs: ["s3-backend", "azure-auth"]
+  before_script:
+    - *backend_auth
+    - *azure_auth
   script:
     - tfapply azure
   rules:
