@@ -46,7 +46,7 @@ include:
 cache:
   key: aws-profile
   paths:
-    - ~/.aws
+    - ~/.aws/config
 
 default:
   image:
@@ -62,7 +62,7 @@ s3-backend:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   script:
     - |
       set -x
@@ -85,7 +85,7 @@ aws-auth:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   script:
     - |
       # Setup AWS CLI for deployment
@@ -117,7 +117,7 @@ gcp-tf-plan:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   script:
     - cat /root/.aws/config
     - tfplan gcp
@@ -131,7 +131,7 @@ gcp-tf-apply:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   needs: ["s3-backend", "gcloud:auth"]
   script:
     - tfapply gcp
@@ -144,7 +144,7 @@ aws-tf-plan:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   needs: ["s3-backend", "aws-auth"]
   script:
     - tfplan aws
@@ -157,7 +157,7 @@ aws-tf-apply:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   needs: ["s3-backend", "aws-auth"]
   script:
     - tfapply aws
@@ -170,7 +170,7 @@ azure-tf-plan:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   needs: ["s3-backend", "azure-auth"]
   script:
     - tfplan azure
@@ -183,7 +183,7 @@ azure-tf-apply:
   cache:
     key: aws-profile
     paths:
-      - ~/.aws
+      - ~/.aws/config
   needs: ["s3-backend", "azure-auth"]
   script:
     - tfapply azure
