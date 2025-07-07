@@ -45,8 +45,8 @@ include:
 
 default:
   image:
-    name $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
-    entrypoint [""]
+    name: $CI_REGISTRY/leecookson-images/triple-cloud-image/tf-deployer:latest
+    entrypoint: [""]
 
 # S3 backend setup job
 s3-backend:
