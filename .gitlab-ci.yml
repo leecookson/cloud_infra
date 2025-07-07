@@ -104,7 +104,7 @@ gcp-tf-plan:
 
 gcp-tf-apply:
   stage: apply
-  needs: ["s3-backend", "gcloud:auth"]
+  needs: ["gcloud:auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -118,7 +118,7 @@ gcp-tf-apply:
 # AWS Jobs
 aws-tf-plan:
   stage: plan
-  needs: ["s3-backend", "aws-auth"]
+  needs: ["aws-auth"]
   id_tokens:
     GITLAB_OIDC_TOKEN:
       aud: https://gitlab.com
@@ -133,7 +133,6 @@ aws-tf-plan:
 
 aws-tf-apply:
   stage: apply
-  needs: ["s3-backend", "aws-auth"]
   before_script:
     - *backend_auth
     - *aws_auth
@@ -145,7 +144,6 @@ aws-tf-apply:
 # Azure Jobs
 azure-tf-plan:
   stage: plan
-  needs: ["s3-backend", "azure-auth"]
   before_script:
     - *backend_auth
     - *azure_auth
@@ -157,7 +155,6 @@ azure-tf-plan:
 
 azure-tf-apply:
   stage: apply
-  needs: ["s3-backend", "azure-auth"]
   before_script:
     - *backend_auth
     - *azure_auth
