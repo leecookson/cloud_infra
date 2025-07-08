@@ -16,7 +16,7 @@ variable "gitlab_project_id" {
   type = number
 }
 
-variable "gitlab_gcp_aservice_account_name" {
+variable "gitlab_gcp_service_account_name" {
   description = "The name of the GitLab GCP service account."
   type        = string
 }
