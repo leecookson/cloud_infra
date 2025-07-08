@@ -29,7 +29,7 @@ variables:
   AZURE_SUBSCRIPTION_ID: "9db9c40a-cbe5-4efc-aacc-a9fa6414c592"
 
   # Google Cloud IAM Configuration
-  GOOGLE_COMPUTE_REGION: "us-east1"
+  GOOGLE_COMPUTE_REGION: "us-east4-c"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
   GOOGLE_PROJECT_NUMBER: "101607275339"
   OIDC_SERVICE_ACCOUNT_EMAIL: "gitlab-pipeline@cookson-pro-gcp.iam.gserviceaccount.com"
@@ -53,7 +53,6 @@ default:
   - |
     export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
-    echo "USER=${USER} USERNAME=${USERNAME} HOME=${HOME} CWD=${CWD}"
     mkdir -p ~/.aws
     echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
     aws configure set --profile s3-backend web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
