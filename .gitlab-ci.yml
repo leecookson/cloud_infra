@@ -31,6 +31,7 @@ variables:
   # Google Cloud IAM Configuration
   GOOGLE_COMPUTE_REGION: "us-east4-c"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
+  GOOGLE_PROVIDER_AUDIENCE: "//iam.googleapis.com/projects/101607275339/locations/global/workloadIdentityPools/gitlab-com/providers/gitlab-com-oidc"
   GOOGLE_PROJECT_NUMBER: "101607275339"
   OIDC_SERVICE_ACCOUNT_EMAIL: "gitlab-pipeline@cookson-pro-gcp.iam.gserviceaccount.com"
   OIDC_WIP_PROVIDER_ID: "gitlab-com-oidc"
@@ -87,7 +88,10 @@ default:
       --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
       --output-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
       --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp
-    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
+    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
+      --workload-identity-provider="$GOOGLE_PROVIDER_AUDIENCE" \
+      --issuer-url="https://gitlab.com"
+
     gcloud auth list
     export TF_VAR_gcp_credentials_file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
 
