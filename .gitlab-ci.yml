@@ -106,7 +106,11 @@ gcp-tf-plan:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfplan gcp
   rules:
-    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ALLPLANS == "true"
+      when: manual
+    - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
     - if: $ACTION == "plan" && $PLATFORM == "gcp" && $CI_PIPELINE_SOURCE == "web"
 
 gcp-tf-apply:
@@ -120,7 +124,8 @@ gcp-tf-apply:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfapply gcp
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "gcp" && $CI_PIPELINE_SOURCE == "web"
+    - if: $ACTION == "apply" && $PLATFORM == "gcp" && $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
 
 # AWS Jobs
 aws-tf-plan:
@@ -132,7 +137,11 @@ aws-tf-plan:
   script:
     - tfplan aws
   rules:
-    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ALLPLANS == "true"
+      when: manual
+    - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
     - if: $ACTION == "plan" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
 
 aws-tf-apply:
@@ -144,7 +153,8 @@ aws-tf-apply:
   script:
     - tfapply aws
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
+    - if: $ACTION == "apply" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
 
 # Azure Jobs
 azure-tf-plan:
@@ -157,7 +167,11 @@ azure-tf-plan:
   script:
     - tfplan azure
   rules:
-    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ALLPLANS == "true"
+      when: manual
+    - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
     - if: $ACTION == "plan" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
 
 azure-tf-apply:
@@ -169,4 +183,5 @@ azure-tf-apply:
   script:
     - tfapply azure
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
+    - if: $ACTION == "apply" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "schedule"
+      when: manual
