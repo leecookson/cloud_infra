@@ -59,7 +59,6 @@ default:
     aws configure set --profile s3-backend web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
     aws configure set --profile s3-backend role_arn $AWS_S3_BACKEND_ROLE
     aws configure set --profile s3-backend region us-east-1
-    cat ~/.aws/config
     aws sts get-caller-identity --profile s3-backend
 
 .aws_auth: &aws_auth
@@ -71,7 +70,6 @@ default:
     aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token_aws
     aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
     aws configure set --profile oidc-profile region us-east-1
-    # cat ~/.aws/config
     aws sts get-caller-identity --profile oidc-profile
 
 .azure-auth: &azure_auth
@@ -101,7 +99,8 @@ gcp-tf-plan:
     - *backend_auth
     - *gcp_auth
   script:
-    - cat /root/.aws/config
+    - echo "GCP Plan"
+    - gcloud auth list
     - tfplan gcp
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
