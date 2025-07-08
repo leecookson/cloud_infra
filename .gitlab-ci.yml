@@ -82,12 +82,14 @@ default:
 # based on https://gitlab.com/guided-explorations/gcp/configure-openid-connect-in-gcp/-/blob/main/.gitlab-ci.yml?ref_type=heads
 .gcp-auth: &gcp_auth
   - |
+    set -x
     echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_gcp
 
     gcloud iam workload-identity-pools create-cred-config ${GOOGLE_PROVIDER_AUDIENCE} \
       --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
       --output-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
       --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp
+    gcloud login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
     gcloud config set account ${OIDC_SERVICE_ACCOUNT_EMAIL}
     gcloud auth list
 
