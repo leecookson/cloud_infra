@@ -1,10 +1,10 @@
 spec:
   inputs:
     ACTION:
-      type: string
+      options: ["plan", "apply", "delete"]
       default: plan
     PLATFORM:
-      type: string
+      options: ["aws", "azure", "gcp"]
       default: aws
     ALLPLANS:
       type: boolean
