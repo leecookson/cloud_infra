@@ -83,6 +83,7 @@ default:
 .gcp-auth: &gcp_auth
   - |
     set -x
+    echo "Set up GCP OIDC connection"
     echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_gcp
 
     gcloud iam workload-identity-pools create-cred-config ${GOOGLE_PROVIDER_AUDIENCE} \
