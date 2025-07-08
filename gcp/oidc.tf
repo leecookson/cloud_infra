@@ -46,7 +46,7 @@ module "gitlab-service-account" {
   project_id = google_project.cookson_pro.project_id
   pool_name  = module.gitlab-wif.pool_name
   account_id = google_service_account.gitlab.id
-  repository = "cookson-group/*"
+  repository = "${var.gitlab_group}/*"
 }
 
 # Assign the 'roles/owner' role at the project level to the service account
