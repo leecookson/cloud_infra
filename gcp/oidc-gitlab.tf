@@ -20,7 +20,7 @@ module "gitlab-service-account" {
   project_id = var.project_id
   pool_name  = module.gitlab-wif.pool_name
   account_id = google_service_account.gitlab.id
-  repository = "${var.gitlab_group}/cloud_infra"
+  repository = "${var.gitlab_group}/*"
   depends_on = [google_service_account.gitlab]
 }
 
