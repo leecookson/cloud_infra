@@ -151,10 +151,10 @@ azure-tf-plan:
   stage: plan
   extends: .id_tokens
   before_script:
+    - env | grep CI_
     - *backend_auth
     - *azure_auth
   script:
-    - env | grep CI_
     - tfplan azure
   rules:
     - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
