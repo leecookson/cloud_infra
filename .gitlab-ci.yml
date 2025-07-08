@@ -106,7 +106,6 @@ gcp-tf-plan:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfplan gcp
   rules:
-    - if: $CI_PIPELINE_SOURCE == "push"
     - if: $ALLPLANS == "true"
     - if: $ACTION == "plan" && $PLATFORM == "gcp"
 
