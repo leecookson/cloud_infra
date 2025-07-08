@@ -32,11 +32,11 @@ variables:
   GOOGLE_COMPUTE_REGION: "us-east4-c"
   GOOGLE_PROJECT_ID: "cookson-pro-gcp"
 
-  # GOOGLE_PROVIDER_AUDIENCE: "//iam.googleapis.com/projects/101607275339/locations/global/workloadIdentityPools/gitlab-com/providers/gitlab-com-oidc"
-  # GOOGLE_PROJECT_NUMBER: "101607275339"
-  # OIDC_SERVICE_ACCOUNT_EMAIL: "gitlab-pipeline@cookson-pro-gcp.iam.gserviceaccount.com"
-  # OIDC_WIP_PROVIDER_ID: "gitlab-com-oidc"
-  # OIDC_WIP_ID: "gitlab-com"
+  GOOGLE_PROVIDER_AUDIENCE: "projects/101607275339/locations/global/workloadIdentityPools/gitlab-com/providers/gitlab-com-oidc"
+  GOOGLE_PROJECT_NUMBER: "101607275339"
+  OIDC_SERVICE_ACCOUNT_EMAIL: "gitlab-pipeline@cookson-pro-gcp.iam.gserviceaccount.com"
+  OIDC_WIP_PROVIDER_ID: "gitlab-com-oidc"
+  OIDC_WIP_ID: "gitlab-com"
 
   # GCP Configuration
   GCP_CLI_VERSION: "404.0.0"
@@ -106,8 +106,8 @@ gcp-tf-plan:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfplan gcp
   rules:
-    - if: $ALLPLANS == "true"
-    - if: $ACTION == "plan" && $PLATFORM == "gcp"
+    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ACTION == "plan" && $PLATFORM == "gcp" && $CI_PIPELINE_SOURCE == "web"
 
 gcp-tf-apply:
   stage: apply
@@ -120,7 +120,7 @@ gcp-tf-apply:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfapply gcp
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "gcp"
+    - if: $ACTION == "apply" && $PLATFORM == "gcp" && $CI_PIPELINE_SOURCE == "web"
 
 # AWS Jobs
 aws-tf-plan:
@@ -132,8 +132,8 @@ aws-tf-plan:
   script:
     - tfplan aws
   rules:
-    - if: $ALLPLANS == "true"
-    - if: $ACTION == "plan" && $PLATFORM == "aws"
+    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ACTION == "plan" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
 
 aws-tf-apply:
   stage: apply
@@ -144,7 +144,7 @@ aws-tf-apply:
   script:
     - tfapply aws
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "aws"
+    - if: $ACTION == "apply" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
 
 # Azure Jobs
 azure-tf-plan:
@@ -156,8 +156,8 @@ azure-tf-plan:
   script:
     - tfplan azure
   rules:
-    - if: $ALLPLANS == "true"
-    - if: $ACTION == "plan" && $PLATFORM == "azure"
+    - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
+    - if: $ACTION == "plan" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
 
 azure-tf-apply:
   stage: apply
@@ -168,4 +168,4 @@ azure-tf-apply:
   script:
     - tfapply azure
   rules:
-    - if: $ACTION == "apply" && $PLATFORM == "azure"
+    - if: $ACTION == "apply" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
