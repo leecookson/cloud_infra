@@ -89,9 +89,10 @@ default:
     gcloud iam workload-identity-pools create-cred-config ${OIDC_WIP_PROVIDER_ID} \
       --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
       --output-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
-      --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp \
-      --scopes=https://www.googleapis.com/auth/cloud-platform
-    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
+      --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp
+    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
+          --scopes=https://www.googleapis.com/auth/cloud-platform
+
     gcloud auth list
 
 # GCP Jobs
