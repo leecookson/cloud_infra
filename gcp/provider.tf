@@ -8,8 +8,7 @@ terraform {
 }
 
 provider "google" {
-  region      = "us-east4-c"
-  project     = "cookson-pro-gcp"
-  credentials = var.gcp_credentials_file
+  region  = "us-east4-c"
+  project = "cookson-pro-gcp"
 }
 
