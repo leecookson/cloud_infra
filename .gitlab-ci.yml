@@ -64,7 +64,6 @@ default:
 .aws_auth: &aws_auth
   - |
     # Setup AWS CLI for deployment
-
     mkdir -p ~/.aws
     echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_aws
     aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token_aws
@@ -84,7 +83,6 @@ default:
 .gcp-auth: &gcp_auth
   - |
     echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_gcp
-   "projects/${!ORB_ENV_PROJECT_NUMBER}/locations/global/workloadIdentityPools/${!ORB_ENV_POOL_ID}/providers/${!ORB_ENV_POOL_PROVIDER_ID}" \
 
     gcloud iam workload-identity-pools create-cred-config ${GOOGLE_PROVIDER_AUDIENCE} \
       --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
