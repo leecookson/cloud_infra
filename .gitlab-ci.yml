@@ -93,6 +93,7 @@ default:
     gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
     gcloud config set account ${OIDC_SERVICE_ACCOUNT_EMAIL}
     gcloud auth list
+    gcloud auth describe ${OIDC_SERVICE_ACCOUNT_EMAIL}
 
 # GCP Jobs
 gcp-tf-plan:
@@ -102,9 +103,10 @@ gcp-tf-plan:
     - *backend_auth
     - *gcp_auth
   script:
-    - gcloud config set account ${OIDC_SERVICE_ACCOUNT_EMAIL}
-    - gcloud auth list
-    - tfplan gcp
+    - |
+      gcloud config set account ${OIDC_SERVICE_ACCOUNT_EMAIL}
+      gcloud auth describe ${OIDC_SERVICE_ACCOUNT_EMAIL}
+      tfplan gcp
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
     - if: $ALLPLANS == "true"
