@@ -2,7 +2,7 @@ module "gitlab-wif" {
   source              = "Cyclenerd/wif-gitlab/google"
   version             = "~> 2.0.0"
   project_id          = var.project_id
-  attribute_condition = "assertion.project_path=='${var.gitlab_group}/cloud_infra' && assertion.namespace_path=='${var.gitlab_group}'"
+  attribute_condition = "assertion.namespace_path.startsWith(\"${var.gitlab_group}\")"
   # Restrict access to username or the name of a GitLab group
   # attribute_condition = "assertion.namespace_path=='${var.gitlab_group}'"
 }
