@@ -154,6 +154,7 @@ azure-tf-plan:
     - *backend_auth
     - *azure_auth
   script:
+    - env | grep CI_
     - tfplan azure
   rules:
     - if: $ALLPLANS == "true" || $CI_PIPELINE_SOURCE == "schedule" || ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
