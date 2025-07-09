@@ -27,3 +27,14 @@ variable "resource_group_name" {
   description = "The name of the Azure Resource Group."
   type        = string
 }
+
+variable "gitlab_all_project_ids" {
+  description = "List of all GitLab project IDs for OIDC integration."
+  type        = list(string)
+}
+
+variable "gitlab_branch" {
+  description = "The branch to use for GitLab OIDC integration."
+  type        = string
+  default     = "main"
+}
