@@ -18,9 +18,13 @@ variable "circleci_user_id" {
   type = string
 }
 
-# Need list of all project IDs for the 
 variable "circleci_all_project_ids" {
-  type = list(string)
+  type        = list(string)
+  description = "List of CircleCI project IDs"
+  validation {
+    condition     = length(var.circleci_all_project_ids) > 0
+    error_message = "At least one CircleCI project ID must be provided."
+  }
 }
 
 variable "resource_group_name" {
@@ -29,8 +33,12 @@ variable "resource_group_name" {
 }
 
 variable "gitlab_all_project_ids" {
-  description = "List of all GitLab project IDs for OIDC integration."
   type        = list(string)
+  description = "List of GitLab repo IDs"
+  validation {
+    condition     = length(var.gitlab_all_project_ids) > 0
+    error_message = "At least one GitLab repo must be provided."
+  }
 }
 
 variable "gitlab_branch" {

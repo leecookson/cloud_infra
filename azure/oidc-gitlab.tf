@@ -26,15 +26,26 @@ resource "azuread_application_federated_identity_credential" "gitlab_oidc" {
 resource "azurerm_role_assignment" "gitlab_contributor" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Contributor"
-  principal_id         = split("/", azuread_service_principal.gitlab.id)[2]
+  principal_id         = azuread_service_principal.gitlab.object_id
 }
 
-resource "azurerm_role_assignment" "gitlab_azuread_contributor" {
+resource "azurerm_role_assignment" "gitlab_ad_contributor" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Domain Services Contributor"
-  principal_id         = split("/", azuread_service_principal.gitlab.id)[2]
+  principal_id         = azuread_service_principal.gitlab.object_id
 }
 
+# Required for managing Azure AD applications and service principals
+resource "azuread_directory_role_assignment" "gitlab_app_admin" {
+  role_id             = azuread_directory_role.app_administrator.object_id
+  principal_object_id = azuread_service_principal.gitlab.object_id
+}
+
+# Alternative: More restrictive but sufficient for OIDC credentials
+resource "azuread_directory_role_assignment" "gitlab_app_developer" {
+  role_id             = azuread_directory_role.app_developer.object_id
+  principal_object_id = azuread_service_principal.gitlab.object_id
+}
 
 output "gitlab_federated_subject" {
   description = "GitLab OIDC subject configured in Azure"

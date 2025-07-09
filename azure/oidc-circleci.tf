@@ -27,13 +27,26 @@ resource "azuread_application_federated_identity_credential" "circleci_oidc" {
 resource "azurerm_role_assignment" "circleci_contributor" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Contributor"
-  principal_id         = split("/", azuread_service_principal.circleci.id)[2]
+  principal_id         = azuread_service_principal.circleci.object_id
 }
 
-resource "azurerm_role_assignment" "circleci_azuread_contributor" {
+resource "azurerm_role_assignment" "circleci_ad_contributor" {
   scope                = data.azurerm_subscription.current.id
   role_definition_name = "Domain Services Contributor"
-  principal_id         = split("/", azuread_service_principal.circleci.id)[2]
+  principal_id         = azuread_service_principal.circleci.object_id
+}
+
+
+# Required for managing Azure AD applications and service principals
+resource "azuread_directory_role_assignment" "circleci_app_admin" {
+  role_id             = azuread_directory_role.app_administrator.object_id
+  principal_object_id = azuread_service_principal.circleci.object_id
+}
+
+# Alternative: More restrictive but sufficient for OIDC credentials
+resource "azuread_directory_role_assignment" "circleci_app_developer" {
+  role_id             = azuread_directory_role.app_developer.object_id
+  principal_object_id = azuread_service_principal.circleci.object_id
 }
 
 
@@ -56,7 +69,7 @@ output "circleci_tenant_id" {
   value       = data.azuread_client_config.current.tenant_id
 }
 
-output "circle_ciservice_principal" {
+output "circleci_service_principal" {
   description = "CircleCI Azure Service Principal"
   value       = azuread_service_principal.circleci.id
 }
