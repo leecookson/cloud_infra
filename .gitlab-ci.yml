@@ -10,10 +10,6 @@ spec:
       type: boolean
       default: false
 ---
-stages:
-  - plan
-  - apply
-
 variables:
   # AWS IAM Configuration
   AWS_DEFAULT_REGION: "us-east-1"
@@ -95,7 +91,6 @@ default:
 
 # GCP Jobs
 gcp-tf-plan:
-  stage: plan
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -110,7 +105,6 @@ gcp-tf-plan:
       when: manual
 
 gcp-tf-apply:
-  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -126,7 +120,6 @@ rules:
 
 # AWS Jobs
 aws-tf-plan:
-  stage: plan
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -142,7 +135,6 @@ aws-tf-plan:
     - if: $ACTION == "plan" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
 
 aws-tf-apply:
-  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -155,7 +147,6 @@ aws-tf-apply:
 
 # Azure Jobs
 azure-tf-plan:
-  stage: plan
   extends: .id_tokens
   before_script:
     - env | grep CI_
@@ -172,7 +163,6 @@ azure-tf-plan:
     - if: $ACTION == "plan" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
 
 azure-tf-apply:
-  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
