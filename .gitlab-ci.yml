@@ -126,12 +126,9 @@ aws-tf-plan:
   script:
     - tfplan aws
   rules:
-    - if: $ALLPLANS == "true"
-      when: manual
     - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $ALLPLANS == "true" || ($ACTION == "plan" && $PLATFORM == "aws")
       when: manual
-    - if: $ACTION == "plan" && $PLATFORM == "aws" && $CI_PIPELINE_SOURCE == "web"
 
 aws-tf-apply:
   extends: .id_tokens
@@ -154,12 +151,9 @@ azure-tf-plan:
   script:
     - tfplan azure
   rules:
-    - if: $ALLPLANS == "true"
-      when: manual
     - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
-    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $ALLPLANS == "true" || ($ACTION == "plan" && $PLATFORM == "azure")
       when: manual
-    - if: $ACTION == "plan" && $PLATFORM == "azure" && $CI_PIPELINE_SOURCE == "web"
 
 azure-tf-apply:
   extends: .id_tokens
