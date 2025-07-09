@@ -10,6 +10,10 @@ spec:
       type: boolean
       default: false
 ---
+stages:
+  - plan
+  - apply
+
 variables:
   # AWS IAM Configuration
   AWS_DEFAULT_REGION: "us-east-1"
@@ -51,28 +55,28 @@ default:
     export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
     mkdir -p ~/.aws
-    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token
-    aws configure set --profile s3-backend web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token
-    aws configure set --profile s3-backend role_arn $AWS_S3_BACKEND_ROLE
-    aws configure set --profile s3-backend region us-east-1
+    echo "${GITLAB_OIDC_TOKEN}" > "${CI_PROJECT_DIR}/web_identity_token"
+    aws configure set --profile s3-backend web_identity_token_file "${CI_PROJECT_DIR}/web_identity_token"
+    aws configure set --profile s3-backend role_arn "${AWS_S3_BACKEND_ROLE}"
+    aws configure set --profile s3-backend region "us-east-1"
     aws sts get-caller-identity --profile s3-backend
 
 .aws_auth: &aws_auth
   - |
     # Setup AWS CLI for deployment
     mkdir -p ~/.aws
-    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_aws
-    aws configure set --profile oidc-profile web_identity_token_file ${CI_PROJECT_DIR}/web_identity_token_aws
-    aws configure set --profile oidc-profile role_arn $AWS_DEPLOY_ROLE
-    aws configure set --profile oidc-profile region us-east-1
+    echo "${GITLAB_OIDC_TOKEN}" > "${CI_PROJECT_DIR}/web_identity_token_aws"
+    aws configure set --profile oidc-profile web_identity_token_file "${CI_PROJECT_DIR}/web_identity_token_aws"
+    aws configure set --profile oidc-profile role_arn "${AWS_DEPLOY_ROLE}"
+    aws configure set --profile oidc-profile region "us-east-1"
     aws sts get-caller-identity --profile oidc-profile
 
 .azure-auth: &azure_auth
   - |
-    az login --federated-token ${GITLAB_OIDC_TOKEN} \
+    az login --federated-token "${GITLAB_OIDC_TOKEN}" \
       --service-principal \
-      --username "$AZURE_CLIENT_ID" \
-      --tenant "$AZURE_TENANT_ID"
+      --username "${AZURE_CLIENT_ID}" \
+      --tenant "${AZURE_TENANT_ID}"
     az account show
 
 # based on https://gitlab.com/guided-explorations/gcp/configure-openid-connect-in-gcp/-/blob/main/.gitlab-ci.yml?ref_type=heads
@@ -80,14 +84,14 @@ default:
   - |
     set -x
     echo "Set up GCP OIDC connection"
-    echo ${GITLAB_OIDC_TOKEN} > ${CI_PROJECT_DIR}/web_identity_token_gcp
+    echo "${GITLAB_OIDC_TOKEN}" > "${CI_PROJECT_DIR}/web_identity_token_gcp"
 
-    gcloud iam workload-identity-pools create-cred-config ${GOOGLE_PROVIDER_AUDIENCE} \
+    gcloud iam workload-identity-pools create-cred-config "${GOOGLE_PROVIDER_AUDIENCE}" \
       --service-account="${OIDC_SERVICE_ACCOUNT_EMAIL}" \
-      --output-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json \
-      --credential-source-file=${CI_PROJECT_DIR}/web_identity_token_gcp
-    gcloud auth login --cred-file=${CI_PROJECT_DIR}/.gcp_temp_cred.json
-    gcloud config set account ${OIDC_SERVICE_ACCOUNT_EMAIL}
+      --output-file="${CI_PROJECT_DIR}/.gcp_temp_cred.json" \
+      --credential-source-file="${CI_PROJECT_DIR}/web_identity_token_gcp"
+    gcloud auth login --cred-file="${CI_PROJECT_DIR}/.gcp_temp_cred.json"
+    gcloud config set account "${OIDC_SERVICE_ACCOUNT_EMAIL}"
 
 # GCP Jobs
 gcp-tf-plan:
@@ -97,7 +101,7 @@ gcp-tf-plan:
     - *gcp_auth
   script:
     - |
-      export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
+      export GOOGLE_APPLICATION_CREDENTIALS="${CI_PROJECT_DIR}/.gcp_temp_cred.json"
       tfplan gcp
   rules:
     - if: ($CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push")
@@ -111,7 +115,7 @@ gcp-tf-apply:
     - *gcp_auth
   script:
     - |
-      export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
+      export GOOGLE_APPLICATION_CREDENTIALS="${CI_PROJECT_DIR}/.gcp_temp_cred.json"
       tfapply gcp
   rules:
     - if: $ACTION == "apply" && $PLATFORM == "gcp"
@@ -144,7 +148,6 @@ aws-tf-apply:
 azure-tf-plan:
   extends: .id_tokens
   before_script:
-    - env | grep CI_
     - *backend_auth
     - *azure_auth
   script:

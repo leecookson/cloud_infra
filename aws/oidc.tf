@@ -5,6 +5,7 @@ module "circleci-oidc-provider" {
   circleci_role_name     = var.circleci_deploy_role_name
   circleci_org_uuid      = var.circleci_org_uuid
   circleci_project_uuids = ["*"]
+
   circleci_oidc_role_attach_policies = [
     aws_iam_policy.terraform.arn
   ]
