@@ -114,9 +114,8 @@ gcp-tf-apply:
       export GOOGLE_APPLICATION_CREDENTIALS=${CI_PROJECT_DIR}/.gcp_temp_cred.json
       tfapply gcp
   rules:
-rules:
-  - if: ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web") && $ACTION == "apply" && $PLATFORM == "gcp"
-    when: manual
+    - if: ($CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web") && $ACTION == "apply" && $PLATFORM == "gcp"
+      when: manual
 
 # AWS Jobs
 aws-tf-plan:
