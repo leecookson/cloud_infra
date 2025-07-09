@@ -16,4 +16,5 @@ provider "azurerm" {
   # service principal, and error indicates it needs subscription_id on the provider
   # subscription_id = var.azure_subscription_id
   features {}
+  subscription_id = var.azure_subscription_id
 }
