@@ -96,6 +96,7 @@ default:
 
 # GCP Jobs
 gcp-tf-plan:
+  stage: plan
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -110,6 +111,7 @@ gcp-tf-plan:
       when: manual
 
 gcp-tf-apply:
+  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -123,6 +125,7 @@ gcp-tf-apply:
 
 # AWS Jobs
 aws-tf-plan:
+  stage: plan
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -135,6 +138,7 @@ aws-tf-plan:
       when: manual
 
 aws-tf-apply:
+  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -147,6 +151,7 @@ aws-tf-apply:
 
 # Azure Jobs
 azure-tf-plan:
+  stage: plan
   extends: .id_tokens
   before_script:
     - *backend_auth
@@ -159,6 +164,7 @@ azure-tf-plan:
       when: manual
 
 azure-tf-apply:
+  stage: apply
   extends: .id_tokens
   before_script:
     - *backend_auth
