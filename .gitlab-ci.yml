@@ -126,6 +126,7 @@ gcp-tf-apply:
       tfapply gcp
   rules:
     - if: $ACTION == "apply" && $PLATFORM == "gcp"
+      when: manual
 
 # AWS Jobs
 aws-tf-plan:
