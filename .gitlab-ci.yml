@@ -53,6 +53,10 @@ default:
 .backend_auth: &backend_auth
   - |
     terraform --version
+    # assuming alpine image
+    ls /etc/[argSd]*
+    apk update
+    apk add jq # needed by tf-scripts
     export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 
     mkdir -p ~/.aws
