@@ -33,3 +33,7 @@ variable "circleci_deploy_project_ids" {
     "faa383a8-cc40-4ff1-8427-9d788ac3681b"
   ]
 }
+
+variable "aws_iam_identity_center_arn" {
+  type = string
+}

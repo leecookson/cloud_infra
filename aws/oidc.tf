@@ -38,3 +38,22 @@ output "gitlab_oidc_provider_arn" {
 output "gitlab_oidc_role" {
   value = module.gitlab-oidc-provider.oidc_role
 }
+
+module "github-oidc-provider" {
+  depends_on = [aws_iam_policy.terraform]
+  source     = "terraform-module/github-oidc-provider/aws"
+  version    = "~> 2.2"
+
+  create_oidc_provider = true
+  create_oidc_role     = true
+  role_name            = "github-actions-oidc-role"
+
+  # Allows all repos and branches from my org
+  repositories = ["leecookson/*"]
+
+  oidc_role_attach_policies = [aws_iam_policy.terraform.arn]
+}
+
+output "github_oidc_role_arn" {
+  value = module.github-oidc-provider.oidc_role
+}
